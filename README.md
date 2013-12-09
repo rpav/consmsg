@@ -187,6 +187,26 @@ are *unidirectional* or perhaps *bidirectional*, message pools are
 *omnidirectional*.  State changes may be *requested* or *observed* via
 the same path and message.
 
+For instance, one may have an irc listener which broadcasts a message
+to `(chat-message irc)` that contains the detail of each message or
+event.  Interested listeners, such as a UI, logging, or some other
+processing mechanism, may register listeners for this path and thus
+receive messages.  The irc listener may also listen on this path and
+send any message it receives to the irc server.
+
+## Networking
+
+At present, no network integration exists; however, consmsg is not
+specifically about *transporting* messages, but rather dispatching
+them once received.
+
+For instance, one could encode a message and path with
+[conspack](https://github.com/conspack/cl-conspack) and send it with
+[ZeroMQ](http://zeromq.org/) or similar.  When a message is received,
+simply `BROADCAST` it.  Similarly, register a function with a global
+wildcard to receive all messages to a pool, then encode and transmit
+them.
+
 ## Protocol
 
 The `CONSMSG` protocol is as follows:
