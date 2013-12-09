@@ -1,0 +1,23 @@
+(in-package :consmsg)
+
+(defun wildcard-match (wildcard path)
+  (let ((w-elem (car wildcard))
+        (w-next (cadr wildcard))
+        (p-elem (car path)))
+    (when (and (eq w-elem '*)
+               (eq w-next '*))
+      (error "Specifying consecutive wildcards is invalid"))
+    (cond
+      ((and (null path)
+            (null w-next)) t)
+      ((and p-elem (eq '* w-elem))
+       (if (eq w-next p-elem)
+           (wildcard-match (cddr wildcard) (cdr path))
+           (wildcard-match wildcard (cdr path))))
+      ((eq p-elem w-elem)
+       (wildcard-match (cdr wildcard) (cdr path)))
+      (t nil))))
+
+(defun wildcardp (path)
+  (or (eq '* path)
+      (member '* path)))
