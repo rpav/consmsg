@@ -8,4 +8,11 @@
    #:register
    #:receive-message
 
+   #:*receiver-object*
+
    #:thread-pool-start #:thread-pool-stop #:with-thread-pool))
+(in-package :consmsg)
+
+ ;; Variables
+
+(defvar *receiver-object* nil)

@@ -78,15 +78,17 @@ messages with `BROADCAST`.  A path must be a list of symbols, where
 (broadcast some-pool '(a path) some-message)
 ```
 
-It may be useful to specify a *sender* to `BROADCAST`, if the receiver
-is *also* registered for the path, to avoid feedback loops:
+It is possible to specify a *sender* to `BROADCAST`.  This is useful
+if the receiver is *also* registered for the path, to avoid feedback
+loops.  **This is now optional,** because `sender` now defaults to the
+receiving object.  However, to illustrate:
 
 ```lisp
 (let ((pool (make-instance 'message-pool)))
   (labels ((receiver1 (path msg)
              (format t "Receiver1 - Path: ~A Msg: ~A~%" path msg)
              (ensure-broadcast pool '(a path) "from receiver1"
-                               #'receiver1))
+                               #'receiver1)) ;; Optional, this is the default
            (receiver2 (path msg)
              (format t "Receiver2 - Path: ~A Msg: ~A~%" path msg)))
     (register pool '(a path) #'receiver1)

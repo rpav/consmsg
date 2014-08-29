@@ -19,7 +19,10 @@
 (defgeneric register-wildcard (pool wildcard object))
 (defgeneric apply-all-wildcards (pool path))
 (defgeneric apply-wildcard (pool wildcard path objects))
-(defgeneric receive-message (object path msg))
+(defgeneric receive-message (object path msg)
+  (:method :around (object path msg)
+    (let ((*receiver-object* object))
+      (call-next-method object path msg))))
 
 (defmethod ensure-path ((pool message-pool) path)
   (declare (type list path))
@@ -41,7 +44,7 @@
     (gethash path id-to-path)))
 
 (defmethod broadcast ((pool message-pool) (id integer) msg
-                      &optional sender)
+                      &optional (sender *receiver-object*))
   (with-slots (id-to-path registered-objects) pool
     (when-let ((object-list (gethash id registered-objects))
                (path (gethash id id-to-path)))
@@ -51,12 +54,12 @@
       t)))
 
 (defmethod broadcast ((pool message-pool) (path list) msg
-                      &optional sender)
+                      &optional (sender *receiver-object*))
   (when-let ((id (find-path pool path)))
     (broadcast pool id msg sender)))
 
 (defmethod ensure-broadcast ((pool message-pool) (path list) msg
-                             &optional sender)
+                             &optional (sender *receiver-object*))
   (let ((id (ensure-path pool path)))
     (broadcast pool id msg sender)))
 
