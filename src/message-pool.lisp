@@ -17,6 +17,8 @@
 (defgeneric ensure-broadcast (pool path msg &optional sender))
 (defgeneric register (pool path object))
 (defgeneric register-wildcard (pool wildcard object))
+(defgeneric unregister (pool path object))
+(defgeneric unregister-wildcard (pool wildcard object))
 (defgeneric apply-all-wildcards (pool path))
 (defgeneric apply-wildcard (pool wildcard path objects))
 (defgeneric receive-message (object path msg)
@@ -90,6 +92,32 @@
 (defmethod register-wildcard ((pool message-pool) (wildcard list) object)
   (with-slots (wildcard-objects) pool
     (pushnew object (gethash wildcard wildcard-objects))))
+
+(defmethod unregister ((pool message-pool) (path integer) object)
+  (with-slots (id-to-path registered-objects) pool
+    (if (gethash path id-to-path)
+        (deletef (gethash path registered-objects) object)
+        (error "Path ID not registered: ~A" path))))
+
+(defmethod unregister ((pool message-pool) (path list) object)
+  (if (wildcardp path)
+      (unregister-wildcard pool path object)
+      (let ((id (ensure-path pool path)))
+        (unregister pool id object))))
+
+(defmethod unregister ((pool message-pool) (path (eql '*)) object)
+  (unregister-wildcard pool '* object))
+
+(defmethod unregister-wildcard ((pool message-pool) (wildcard list) object)
+  (with-slots (path-to-id) pool
+    (dolist (path (hash-table-keys path-to-id))
+      (when (wildcard-match wildcard path)
+        (unregister pool path object)))))
+
+(defmethod unregister-wildcard ((pool message-pool) (wildcard (eql '*)) object)
+  (with-slots (path-to-id) pool
+    (dolist (path (hash-table-keys path-to-id))
+      (unregister pool path object))))
 
 (defmethod apply-all-wildcards ((pool message-pool) path)
   (with-slots (global-wildcard-objects wildcard-objects path-to-id)

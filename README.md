@@ -232,6 +232,8 @@ The `CONSMSG` protocol is as follows:
 * `register-wildcard POOL WILDCARD OBJECT`: Register `OBJECT` on
   wildcard `WILDCARD`.  This is called by `REGISTER` internally and
   should generally not be called explicitly by the user.
+* `unregister POOL PATH OBJECT`: Remove `OBJECT` from the path. It
+  will no longer receive messages sent to `PATH` in `POOL`.
 * `apply-all-wildcards POOL PATH`: Apply all known wildcards to the
   path `PATH`.  This may be called repeatedly on the same path, and
   should not result in duplicate messages to objects.  This is called
@@ -254,6 +256,7 @@ Generally, the following generic functions are useful for day-to-day usage:
 * `ensure-path`
 * `find-path`
 * `register`
+* `unregister`
 * `broadcast`
 * `ensure-broadcast`
 

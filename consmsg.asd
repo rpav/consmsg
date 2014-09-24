@@ -9,7 +9,7 @@
   :license "BSD-2-Clause"
   :version "0.0"
 
-  :depends-on (:alexandria :bordeaux-threads :trivial-channels)
+  :depends-on (:alexandria :bordeaux-threads :trivial-channels :defpackage-plus)
   :pathname "src"
   :serial t
 
