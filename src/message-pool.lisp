@@ -109,15 +109,17 @@
   (unregister-wildcard pool '* object))
 
 (defmethod unregister-wildcard ((pool message-pool) (wildcard list) object)
-  (with-slots (path-to-id) pool
+  (with-slots (path-to-id wildcard-objects) pool
     (dolist (path (hash-table-keys path-to-id))
       (when (wildcard-match wildcard path)
-        (unregister pool path object)))))
+        (unregister pool path object)))
+    (deletef (gethash wildcard wildcard-objects) object)))
 
 (defmethod unregister-wildcard ((pool message-pool) (wildcard (eql '*)) object)
-  (with-slots (path-to-id) pool
+  (with-slots (path-to-id global-wildcard-objects) pool
     (dolist (path (hash-table-keys path-to-id))
-      (unregister pool path object))))
+      (unregister pool path object))
+    (deletef global-wildcard-objects object)))
 
 (defmethod apply-all-wildcards ((pool message-pool) path)
   (with-slots (global-wildcard-objects wildcard-objects path-to-id)

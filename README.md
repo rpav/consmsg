@@ -234,6 +234,11 @@ The `CONSMSG` protocol is as follows:
   should generally not be called explicitly by the user.
 * `unregister POOL PATH OBJECT`: Remove `OBJECT` from the path. It
   will no longer receive messages sent to `PATH` in `POOL`.
+  Specifying wildcards, including the global wildcard, is legal, even
+  if the object is not registered to the wildcard.  **However**, if
+  the object *is* registered to a wildcard, and you do not unregister
+  that wildcard, **you may get unexpected behavior**, because it will
+  *still be registered to that wildcard*.
 * `apply-all-wildcards POOL PATH`: Apply all known wildcards to the
   path `PATH`.  This may be called repeatedly on the same path, and
   should not result in duplicate messages to objects.  This is called
